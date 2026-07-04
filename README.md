@@ -6,6 +6,30 @@
 ## 한 줄 요약
 `python mark_down.py --input ./input-folder`를 실행하면 지원 파일을 `markdown/<확장자>/`에 `.md`로 저장하고, 성공한 원본만 `processed/<확장자>/`로 이동합니다.
 
+## 빠른 시작
+GitHub에서 ZIP으로 내려받거나 `git clone`으로 받은 뒤, 아래 순서대로 실행하세요.
+
+```bash
+git clone https://github.com/daneyoh/markitdown_folder.git
+cd markitdown_folder
+```
+
+macOS:
+
+```bash
+scripts/setup_macos.sh
+scripts/run_macos.sh --input /Users/you/Desktop/sample-folder --dry-run
+scripts/run_macos.sh --input /Users/you/Desktop/sample-folder
+```
+
+Windows PowerShell:
+
+```powershell
+.\scripts\setup_windows.ps1
+.\scripts\run_windows.bat --input C:\Users\you\Desktop\sample-folder --dry-run
+.\scripts\run_windows.bat --input C:\Users\you\Desktop\sample-folder
+```
+
 ## 지원 파일
 - `pdf`
 - `docx`
@@ -52,58 +76,70 @@ work-folder/
 Python 3.10+ 환경에서 실행하세요.
 
 ```bash
-cd /Users/donghoon/Desktop/Work_W_Claude/mark_down
+cd markitdown_folder
 python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install -r requirements.txt
+```
+
+또는:
+
+```bash
+scripts/setup_macos.sh
 ```
 
 ## macOS 실행
 기본 실행:
 
 ```bash
-python3 mark_down.py --input /Users/donghoon/Desktop/sample-folder
+python3 mark_down.py --input /Users/you/Desktop/sample-folder
 ```
 
 미리보기:
 
 ```bash
-python3 mark_down.py --input /Users/donghoon/Desktop/sample-folder --dry-run
+python3 mark_down.py --input /Users/you/Desktop/sample-folder --dry-run
 ```
 
 helper script:
 
 ```bash
-scripts/run_macos.sh --input /Users/donghoon/Desktop/sample-folder
+scripts/run_macos.sh --input /Users/you/Desktop/sample-folder
 ```
 
 ## Windows 설치
 Python 3.10+ 환경에서 실행하세요.
 
 ```powershell
-cd C:\Users\DH\Desktop\mark_down
+cd C:\Users\you\Desktop\markitdown_folder
 py -3.10 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+```
+
+또는:
+
+```powershell
+.\scripts\setup_windows.ps1
 ```
 
 ## Windows 실행
 기본 실행:
 
 ```powershell
-python mark_down.py --input C:\Users\DH\Desktop\sample-folder
+python mark_down.py --input C:\Users\you\Desktop\sample-folder
 ```
 
 미리보기:
 
 ```powershell
-python mark_down.py --input C:\Users\DH\Desktop\sample-folder --dry-run
+python mark_down.py --input C:\Users\you\Desktop\sample-folder --dry-run
 ```
 
 helper script:
 
 ```bat
-scripts\run_windows.bat --input C:\Users\DH\Desktop\sample-folder
+scripts\run_windows.bat --input C:\Users\you\Desktop\sample-folder
 ```
 
 ## 옵션
@@ -154,6 +190,12 @@ dist\mark-down\
 ```
 
 `--onefile` 단일 파일 배포는 v1 기본값이 아닙니다. MarkItDown 의존성이 큰 편이라 v1에서는 문제 추적이 쉬운 `onedir`을 먼저 안정화합니다.
+
+### GitHub Actions 빌드
+이 repo는 `.github/workflows/build.yml`로 macOS와 Windows 빌드를 실행합니다.
+
+- `main` push 또는 pull request: 테스트와 OS별 PyInstaller build artifact 생성
+- `v*` tag push: GitHub Release에 macOS/Windows zip 파일 업로드
 
 ## 안전 규칙
 - 한 번 실행하고 종료합니다. 상주 watcher가 아닙니다.
