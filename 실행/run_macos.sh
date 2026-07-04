@@ -9,4 +9,4 @@ if [[ -f "$ROOT_DIR/.venv/bin/activate" ]]; then
   source "$ROOT_DIR/.venv/bin/activate"
 fi
 
-python3 "$ROOT_DIR/bin/mark_down.py" "$@"
+python3 "$ROOT_DIR/실행/mark_down.py" "$@"

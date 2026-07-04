@@ -5,8 +5,8 @@ import tempfile
 import unittest
 from pathlib import Path
 
-ROOT_DIR = Path(__file__).resolve().parents[1]
-SRC_DIR = ROOT_DIR / "src"
+ROOT_DIR = Path(__file__).resolve().parents[2]
+SRC_DIR = ROOT_DIR / "개발" / "src"
 sys.path.insert(0, str(SRC_DIR))
 
 import mark_down
@@ -109,6 +109,31 @@ class MarkDownTests(unittest.TestCase):
             self.assertEqual(event["status"], "failed")
             self.assertIn("fake conversion failed", event["error"])
 
+    def test_failed_move_removes_markdown_and_keeps_source(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "report.txt"
+            source.write_text("hello", encoding="utf-8")
+            original_move = mark_down.move_file_no_overwrite
+
+            def fail_move(source_path: Path, destination_path: Path) -> None:
+                raise PermissionError("move blocked")
+
+            try:
+                mark_down.move_file_no_overwrite = fail_move
+                summary = mark_down.convert_folder(root, converter=FakeConverter())
+            finally:
+                mark_down.move_file_no_overwrite = original_move
+
+            self.assertEqual(summary.failed, 1)
+            self.assertTrue(source.exists())
+            self.assertFalse((root / "변환" / "txt" / "report.md").exists())
+            self.assertFalse((root / "원본완료" / "txt" / "report.txt").exists())
+            log_lines = (root / "logs" / "conversions.jsonl").read_text(encoding="utf-8").splitlines()
+            event = json.loads(log_lines[0])
+            self.assertEqual(event["status"], "failed")
+            self.assertIn("move blocked", event["error"])
+
     def test_dry_run_does_not_write_move_or_convert(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -127,12 +152,21 @@ class MarkDownTests(unittest.TestCase):
 
     def test_source_mode_cli_smoke_with_list_supported(self):
         completed = subprocess.run(
-            [sys.executable, "bin/mark_down.py", "--list-supported"],
+            [sys.executable, "실행/mark_down.py", "--list-supported"],
             check=True,
             text=True,
             capture_output=True,
         )
         self.assertIn("txt", completed.stdout.splitlines())
+
+    def test_cli_requires_input_for_conversion(self):
+        completed = subprocess.run(
+            [sys.executable, "실행/mark_down.py"],
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(completed.returncode, 2)
+        self.assertIn("--input is required", completed.stderr)
 
     def test_readme_contract(self):
         readme = Path("README.md").read_text(encoding="utf-8")
@@ -143,19 +177,21 @@ class MarkDownTests(unittest.TestCase):
             "## macOS 실행",
             "## Windows 설치",
             "## Windows 실행",
-            "## 배포용 빌드",
             "## 안전 규칙",
             "Python 3.10+",
             "## repo 구조",
-            "assets/icons",
             "변환/<형식>/",
             "원본완료/<형식>/",
-            "pyinstaller --onedir --name mark-down --icon assets/icons/mark-down.icns --paths src bin/mark_down.py",
+            "Microsoft MarkItDown",
+            "실행/",
+            "개발/",
             "--input",
             "--dry-run",
         ]
         for text in required:
             self.assertIn(text, readme)
+        for text in ["PyInstaller", "pyinstaller", "requirements-dev", "assets/icons"]:
+            self.assertNotIn(text, readme)
 
 
 if __name__ == "__main__":

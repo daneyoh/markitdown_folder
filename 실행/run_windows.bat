@@ -4,4 +4,4 @@ setlocal
 set "ROOT_DIR=%~dp0.."
 if exist "%ROOT_DIR%\.venv\Scripts\activate.bat" call "%ROOT_DIR%\.venv\Scripts\activate.bat"
 
-python "%ROOT_DIR%\bin\mark_down.py" %*
+python "%~dp0mark_down.py" %*

@@ -15,8 +15,8 @@ python3 -m venv .venv
 # shellcheck disable=SC1091
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
-python3 -m pip install -r requirements.txt
-python3 bin/mark_down.py --list-supported
+python3 -m pip install -r 개발/requirements.txt
+python3 실행/mark_down.py --list-supported
 
 printf '\nSetup complete. Try:\n'
-printf '  scripts/run_macos.sh --input /path/to/folder --dry-run\n'
+printf '  실행/run_macos.sh --input /path/to/folder --dry-run\n'

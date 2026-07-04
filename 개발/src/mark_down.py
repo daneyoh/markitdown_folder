@@ -98,7 +98,7 @@ class MarkItDownConverter:
         except ImportError as exc:
             raise RuntimeError(
                 "MarkItDown is not installed. Install dependencies with: "
-                "python -m pip install -r requirements.txt"
+                "python -m pip install -r 개발/requirements.txt"
             ) from exc
         self._client = MarkItDown()
 
@@ -200,10 +200,20 @@ def write_log(log_file: Path, event: dict[str, Any]) -> None:
 
 def write_text_no_overwrite(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("x", encoding="utf-8") as handle:
-        handle.write(text)
-        if not text.endswith("\n"):
-            handle.write("\n")
+    created = False
+    try:
+        with path.open("x", encoding="utf-8") as handle:
+            created = True
+            handle.write(text)
+            if not text.endswith("\n"):
+                handle.write("\n")
+    except Exception:
+        if created:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                pass
+        raise
 
 
 def move_file_no_overwrite(source: Path, destination: Path) -> None:
@@ -237,11 +247,18 @@ def plan_dry_run(plan: ConversionPlan) -> ConversionResult:
 
 
 def convert_plan(plan: ConversionPlan, converter: Converter, log_file: Path) -> ConversionResult:
+    markdown_written = False
     try:
         markdown_text = converter.convert(plan.source)
         write_text_no_overwrite(plan.markdown_path, markdown_text)
+        markdown_written = True
         move_file_no_overwrite(plan.source, plan.processed_path)
     except Exception as exc:
+        if markdown_written:
+            try:
+                plan.markdown_path.unlink()
+            except FileNotFoundError:
+                pass
         result = ConversionResult(
             source=plan.source,
             extension=plan.extension,
@@ -367,8 +384,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--input",
         "-i",
         type=Path,
-        default=Path.cwd(),
-        help="Local folder to scan once. Defaults to the current working directory.",
+        default=None,
+        help="Local folder to scan once. Required unless --list-supported is used.",
     )
     parser.add_argument(
         "--output",
@@ -408,6 +425,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if args.list_supported:
         print("\n".join(sorted(SUPPORTED_EXTENSIONS)))
         return 0
+
+    if args.input is None:
+        parser.print_usage(sys.stderr)
+        print("error: --input is required unless --list-supported is used", file=sys.stderr)
+        return 2
 
     try:
         summary = convert_folder(

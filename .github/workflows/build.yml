@@ -9,59 +9,19 @@ on:
   pull_request:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   test:
-    name: test
+    name: source-mode-test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - run: python -m pip install --upgrade pip
-      - run: python -m py_compile src/mark_down.py bin/mark_down.py
-      - run: python -m unittest discover -s tests
-
-  package:
-    name: package-${{ matrix.os }}
-    needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - macos-latest
-          - windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-      - run: python -m pip install --upgrade pip
-      - run: python -m pip install -r requirements-dev.txt
-      - name: Build macOS
-        if: runner.os == 'macOS'
-        run: scripts/build_macos.sh
-      - name: Build Windows
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: .\scripts\build_windows.ps1
-      - name: Prepare artifact
-        shell: bash
-        run: |
-          if [[ "${RUNNER_OS}" == "Windows" ]]; then
-            7z a mark-down-windows.zip ./dist/mark-down/*
-          else
-            ditto -c -k --sequesterRsrc --keepParent ./dist/mark-down mark-down-macos.zip
-          fi
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mark-down-${{ runner.os }}
-          path: mark-down-*.zip
-      - name: Upload release assets
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: mark-down-*.zip
+      - run: python -m py_compile 개발/src/mark_down.py 실행/mark_down.py
+      - run: bash -n 실행/setup_macos.sh
+      - run: bash -n 실행/run_macos.sh
+      - run: python -m unittest discover -s 개발/tests
+      - run: python 실행/mark_down.py --list-supported
