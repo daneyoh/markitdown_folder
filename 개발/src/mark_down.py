@@ -178,6 +178,14 @@ def resolve_under_input(input_dir: Path, path: Path) -> Path:
     return input_dir / expanded
 
 
+def resolve_targets(base_dir: Path, output_dir: Path, processed_dir: Path, log_file: Path) -> tuple[Path, Path, Path]:
+    return (
+        resolve_under_input(base_dir, output_dir),
+        resolve_under_input(base_dir, processed_dir),
+        resolve_under_input(base_dir, log_file),
+    )
+
+
 def build_plan(source: Path, markdown_root: Path, processed_root: Path) -> ConversionPlan:
     extension = normalize_extension(source)
     markdown_path = collision_safe_path(markdown_root / extension / f"{source.stem}.md")
@@ -321,9 +329,9 @@ def convert_folder(
     if not input_dir.is_dir():
         raise NotADirectoryError(f"Input path must be a local folder: {input_dir}")
 
-    markdown_root = resolve_under_input(input_dir, output_dir)
-    processed_root = resolve_under_input(input_dir, processed_dir)
-    resolved_log_file = resolve_under_input(input_dir, log_file)
+    markdown_root, processed_root, resolved_log_file = resolve_targets(
+        input_dir, output_dir, processed_dir, log_file
+    )
 
     summary = Summary()
     supported_files = set(scan_root_only(input_dir))
@@ -361,6 +369,65 @@ def convert_folder(
                     "reason": result.reason,
                 },
             )
+
+    return summary
+
+
+def convert_files(
+    files: Sequence[Path],
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
+    processed_dir: Path = DEFAULT_PROCESSED_DIR,
+    log_file: Path = DEFAULT_LOG_FILE,
+    converter: Optional[Converter] = None,
+    dry_run: bool = False,
+) -> Summary:
+    summary = Summary()
+    resolved_files: list[Path] = []
+    for source in files:
+        resolved_source = source.expanduser().resolve()
+        if not resolved_source.exists():
+            raise FileNotFoundError(f"Selected file does not exist: {resolved_source}")
+        if not resolved_source.is_file():
+            raise IsADirectoryError(f"Selected path must be a file: {resolved_source}")
+        resolved_files.append(resolved_source)
+
+    supported_files = [source for source in resolved_files if is_supported_file(source)]
+    active_converter: Optional[Converter] = converter
+    if supported_files and not dry_run and active_converter is None:
+        active_converter = MarkItDownConverter()
+
+    for source in resolved_files:
+        if not is_supported_file(source):
+            result = ConversionResult(
+                source=source,
+                extension=normalize_extension(source),
+                status="skipped",
+                reason="unsupported-extension",
+            )
+            summary.add(result)
+            if not dry_run:
+                _, _, resolved_log_file = resolve_targets(source.parent, output_dir, processed_dir, log_file)
+                write_log(
+                    resolved_log_file,
+                    {
+                        "status": "skipped",
+                        "source": source,
+                        "extension": result.extension,
+                        "reason": result.reason,
+                    },
+                )
+            continue
+
+        markdown_root, processed_root, resolved_log_file = resolve_targets(
+            source.parent, output_dir, processed_dir, log_file
+        )
+        plan = build_plan(source, markdown_root, processed_root)
+        if dry_run:
+            summary.add(plan_dry_run(plan))
+            continue
+        if active_converter is None:
+            raise RuntimeError("Converter was not initialized")
+        summary.add(convert_plan(plan, active_converter, resolved_log_file))
 
     return summary
 

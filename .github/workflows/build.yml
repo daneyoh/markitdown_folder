@@ -20,11 +20,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
-      - run: python -m py_compile 개발/src/mark_down.py 실행/mark_down.py
+      - run: python -m py_compile 개발/src/mark_down.py 실행/mark_down.py 실행/mark_down_gui.py 실행/auto_convert.py 실행/test_board.py
       - run: bash -n 실행/macOS/setup.sh
       - run: bash -n 실행/macOS/run.sh
+      - run: bash -n 실행/macOS/open_gui.command
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r 개발/requirements.txt
       - run: python -c "from markitdown import MarkItDown; MarkItDown(); print('markitdown import ok')"
       - run: python -m unittest discover -s 개발/tests
       - run: python 실행/mark_down.py --list-supported
+      - run: python 실행/test_board.py

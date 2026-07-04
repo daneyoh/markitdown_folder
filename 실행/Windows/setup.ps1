@@ -16,7 +16,9 @@ $Requirements = Join-Path "개발" "requirements.txt"
 $Launcher = Join-Path "실행" "mark_down.py"
 python -m pip install -r $Requirements
 python $Launcher --list-supported
+New-Item -ItemType Directory -Force -Path "변환할PDF" | Out-Null
 
 Write-Host ""
 Write-Host "Setup complete. Try:"
-Write-Host "  .\실행\Windows\run.bat --input C:\path\to\folder --dry-run"
+Write-Host "  기본 작업 폴더: $RootDir\변환할PDF"
+Write-Host "  .\실행\Windows\open_gui.bat"

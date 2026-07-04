@@ -28,6 +28,8 @@ source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r 개발/requirements.txt
 python 실행/mark_down.py --list-supported
+mkdir -p 변환할PDF
 
 printf '\nSetup complete. Try:\n'
-printf '  실행/macOS/run.sh --input /path/to/folder --dry-run\n'
+printf '  기본 작업 폴더: %s/변환할PDF\n' "$ROOT_DIR"
+printf '  실행/macOS/open_gui.command\n'

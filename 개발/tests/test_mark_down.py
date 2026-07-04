@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import subprocess
 import sys
 import tempfile
@@ -10,6 +11,17 @@ SRC_DIR = ROOT_DIR / "개발" / "src"
 sys.path.insert(0, str(SRC_DIR))
 
 import mark_down
+
+LAUNCHER_DIR = ROOT_DIR / "실행"
+
+
+def load_launcher_module(name: str):
+    spec = importlib.util.spec_from_file_location(name, LAUNCHER_DIR / f"{name}.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Cannot load launcher module: {name}")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 class FakeConverter:
@@ -150,9 +162,64 @@ class MarkDownTests(unittest.TestCase):
             self.assertFalse((root / "원본완료").exists())
             self.assertFalse((root / "logs").exists())
 
+    def test_convert_files_writes_next_to_each_selected_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            left = root / "left"
+            right = root / "right"
+            left.mkdir()
+            right.mkdir()
+            source_a = left / "a.pdf"
+            source_b = right / "b.txt"
+            source_a.write_text("a", encoding="utf-8")
+            source_b.write_text("b", encoding="utf-8")
+
+            summary = mark_down.convert_files([source_a, source_b], converter=FakeConverter())
+
+            self.assertEqual(summary.converted, 2)
+            self.assertFalse(source_a.exists())
+            self.assertFalse(source_b.exists())
+            self.assertTrue((left / "변환" / "pdf" / "a.md").exists())
+            self.assertTrue((left / "원본완료" / "pdf" / "a.pdf").exists())
+            self.assertTrue((right / "변환" / "txt" / "b.md").exists())
+            self.assertTrue((right / "원본완료" / "txt" / "b.txt").exists())
+            self.assertTrue((left / "logs" / "conversions.jsonl").exists())
+            self.assertTrue((right / "logs" / "conversions.jsonl").exists())
+
+    def test_convert_files_dry_run_does_not_touch_disk(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "report.txt"
+            source.write_text("hello", encoding="utf-8")
+            converter = FakeConverter()
+
+            summary = mark_down.convert_files([source], converter=converter, dry_run=True)
+
+            self.assertEqual(summary.planned, 1)
+            self.assertEqual(converter.seen, [])
+            self.assertTrue(source.exists())
+            self.assertFalse((root / "변환").exists())
+            self.assertFalse((root / "원본완료").exists())
+            self.assertFalse((root / "logs").exists())
+
+    def test_convert_files_skips_unsupported_and_logs_in_source_folder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root / "image.png"
+            source.write_text("png", encoding="utf-8")
+
+            summary = mark_down.convert_files([source], converter=FakeConverter())
+
+            self.assertEqual(summary.skipped, 1)
+            self.assertTrue(source.exists())
+            log_lines = (root / "logs" / "conversions.jsonl").read_text(encoding="utf-8").splitlines()
+            event = json.loads(log_lines[0])
+            self.assertEqual(event["status"], "skipped")
+            self.assertEqual(event["reason"], "unsupported-extension")
+
     def test_source_mode_cli_smoke_with_list_supported(self):
         completed = subprocess.run(
-            [sys.executable, "실행/mark_down.py", "--list-supported"],
+            [sys.executable, str(LAUNCHER_DIR / "mark_down.py"), "--list-supported"],
             check=True,
             text=True,
             capture_output=True,
@@ -161,12 +228,47 @@ class MarkDownTests(unittest.TestCase):
 
     def test_cli_requires_input_for_conversion(self):
         completed = subprocess.run(
-            [sys.executable, "실행/mark_down.py"],
+            [sys.executable, str(LAUNCHER_DIR / "mark_down.py")],
             text=True,
             capture_output=True,
         )
         self.assertEqual(completed.returncode, 2)
         self.assertIn("--input is required", completed.stderr)
+
+    def test_gui_module_compiles(self):
+        completed = subprocess.run(
+            [sys.executable, "-m", "py_compile", str(LAUNCHER_DIR / "mark_down_gui.py")],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(completed.stdout, "")
+
+    def test_auto_convert_skips_default_readme(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "README.txt").write_text("guide", encoding="utf-8")
+            (root / "sample.txt").write_text("sample", encoding="utf-8")
+            auto_convert = load_launcher_module("auto_convert")
+
+            files = auto_convert.collect_default_files(root)
+
+            self.assertEqual([path.name for path in files], ["sample.txt"])
+
+    def test_auto_convert_and_test_board_modules_compile(self):
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "py_compile",
+                str(LAUNCHER_DIR / "auto_convert.py"),
+                str(LAUNCHER_DIR / "test_board.py"),
+            ],
+            check=True,
+            text=True,
+            capture_output=True,
+        )
+        self.assertEqual(completed.stdout, "")
 
     def test_readme_contract(self):
         readme = Path("README.md").read_text(encoding="utf-8")
@@ -186,6 +288,11 @@ class MarkDownTests(unittest.TestCase):
             "실행/",
             "실행/macOS/",
             "실행/Windows/",
+            "open_gui.command",
+            "open_gui.bat",
+            "auto_convert.py",
+            "test_board.py",
+            "파일 선택",
             "개발/",
             "--input",
             "--dry-run",
