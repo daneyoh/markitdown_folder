@@ -28,6 +28,7 @@ SUPPORTED_EXTENSIONS = {
 DEFAULT_OUTPUT_DIR = Path("변환")
 DEFAULT_PROCESSED_DIR = Path("원본완료")
 DEFAULT_LOG_FILE = Path("logs/conversions.jsonl")
+MIN_PYTHON_VERSION = (3, 10)
 
 GENERATED_DIR_NAMES = {
     "변환",
@@ -93,6 +94,11 @@ class MarkItDownConverter:
     """Adapter around MarkItDown so tests can inject a fake converter."""
 
     def __init__(self) -> None:
+        if sys.version_info < MIN_PYTHON_VERSION:
+            raise RuntimeError(
+                "Python 3.10+ is required for Microsoft MarkItDown. "
+                f"Current Python: {sys.version_info.major}.{sys.version_info.minor}"
+            )
         try:
             from markitdown import MarkItDown  # type: ignore
         except ImportError as exc:

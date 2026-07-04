@@ -79,9 +79,9 @@ Python 3.10+ 환경에서 실행하세요.
 
 ```bash
 cd markitdown_folder
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
-python3 -m pip install -r 개발/requirements.txt
+python -m pip install -r 개발/requirements.txt
 ```
 
 또는:
@@ -89,6 +89,8 @@ python3 -m pip install -r 개발/requirements.txt
 ```bash
 실행/setup_macos.sh
 ```
+
+`실행/setup_macos.sh`는 `python3.12`, `python3.11`, `python3.10`, `python3` 순서로 Python 3.10+를 찾습니다.
 
 ## macOS 실행
 `--input`은 필수입니다. 입력 폴더를 지정하지 않으면 변환하지 않고 사용법만 보여줍니다.
@@ -118,6 +120,8 @@ python -m pip install -r .\개발\requirements.txt
 ```powershell
 .\실행\setup_windows.ps1
 ```
+
+`.\실행\setup_windows.ps1`는 `py -3`가 Python 3.10+인지 확인한 뒤 venv를 만듭니다.
 
 ## Windows 실행
 `--input`은 필수입니다. 입력 폴더를 지정하지 않으면 변환하지 않고 사용법만 보여줍니다.
