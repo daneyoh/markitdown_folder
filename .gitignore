@@ -7,7 +7,4 @@ dist/
 markdown/
 processed/
 logs/
-.omx/state/
-.omx/team/
-.omx/logs/
-.omx/tmux-hook.json
+.omx/
