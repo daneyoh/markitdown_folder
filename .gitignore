@@ -8,3 +8,5 @@ markdown/
 processed/
 logs/
 .omx/
+assets/icons/*.iconset/
+assets/icons/mark-down-[0-9]*.png

@@ -7,7 +7,7 @@ py -3.10 -m venv .venv
 . .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-python mark_down.py --list-supported
+python bin\mark_down.py --list-supported
 
 Write-Host ""
 Write-Host "Setup complete. Try:"

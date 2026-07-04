@@ -16,7 +16,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 python3 -m pip install --upgrade pip
 python3 -m pip install -r requirements.txt
-python3 mark_down.py --list-supported
+python3 bin/mark_down.py --list-supported
 
 printf '\nSetup complete. Try:\n'
 printf '  scripts/run_macos.sh --input /path/to/folder --dry-run\n'

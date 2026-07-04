@@ -11,5 +11,5 @@ if [[ -f ".venv/bin/activate" ]]; then
   source ".venv/bin/activate"
 fi
 
-python3 -m PyInstaller --onedir --name mark-down mark_down.py
+python3 -m PyInstaller --onedir --name mark-down --icon assets/icons/mark-down.icns --paths src bin/mark_down.py
 printf 'Built macOS onedir package at %s\n' "$ROOT_DIR/dist/mark-down"

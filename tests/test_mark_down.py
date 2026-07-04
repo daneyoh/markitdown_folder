@@ -5,6 +5,10 @@ import tempfile
 import unittest
 from pathlib import Path
 
+ROOT_DIR = Path(__file__).resolve().parents[1]
+SRC_DIR = ROOT_DIR / "src"
+sys.path.insert(0, str(SRC_DIR))
+
 import mark_down
 
 
@@ -121,7 +125,7 @@ class MarkDownTests(unittest.TestCase):
 
     def test_source_mode_cli_smoke_with_list_supported(self):
         completed = subprocess.run(
-            [sys.executable, "mark_down.py", "--list-supported"],
+            [sys.executable, "bin/mark_down.py", "--list-supported"],
             check=True,
             text=True,
             capture_output=True,
@@ -140,7 +144,9 @@ class MarkDownTests(unittest.TestCase):
             "## 배포용 빌드",
             "## 안전 규칙",
             "Python 3.10+",
-            "pyinstaller --onedir --name mark-down mark_down.py",
+            "## repo 구조",
+            "assets/icons",
+            "pyinstaller --onedir --name mark-down --icon assets/icons/mark-down.icns --paths src bin/mark_down.py",
             "--input",
             "--dry-run",
         ]

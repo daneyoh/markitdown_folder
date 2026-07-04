@@ -4,7 +4,7 @@
 로컬 폴더에 모아 둔 문서 파일을 한 번 실행으로 Markdown으로 변환하고, 성공한 원본은 `processed/`로 옮겨 폴더를 정리하기 위한 도구입니다.
 
 ## 한 줄 요약
-`python mark_down.py --input ./input-folder`를 실행하면 지원 파일을 `markdown/<확장자>/`에 `.md`로 저장하고, 성공한 원본만 `processed/<확장자>/`로 이동합니다.
+`python bin/mark_down.py --input ./input-folder`를 실행하면 지원 파일을 `markdown/<확장자>/`에 `.md`로 저장하고, 성공한 원본만 `processed/<확장자>/`로 이동합니다.
 
 ## 빠른 시작
 GitHub에서 ZIP으로 내려받거나 `git clone`으로 받은 뒤, 아래 순서대로 실행하세요.
@@ -44,7 +44,7 @@ Windows PowerShell:
 지원 목록만 확인하려면:
 
 ```bash
-python3 mark_down.py --list-supported
+python3 bin/mark_down.py --list-supported
 ```
 
 ## 폴더 구조
@@ -92,13 +92,13 @@ scripts/setup_macos.sh
 기본 실행:
 
 ```bash
-python3 mark_down.py --input /Users/you/Desktop/sample-folder
+python3 bin/mark_down.py --input /Users/you/Desktop/sample-folder
 ```
 
 미리보기:
 
 ```bash
-python3 mark_down.py --input /Users/you/Desktop/sample-folder --dry-run
+python3 bin/mark_down.py --input /Users/you/Desktop/sample-folder --dry-run
 ```
 
 helper script:
@@ -127,13 +127,13 @@ python -m pip install -r requirements.txt
 기본 실행:
 
 ```powershell
-python mark_down.py --input C:\Users\you\Desktop\sample-folder
+python bin\mark_down.py --input C:\Users\you\Desktop\sample-folder
 ```
 
 미리보기:
 
 ```powershell
-python mark_down.py --input C:\Users\you\Desktop\sample-folder --dry-run
+python bin\mark_down.py --input C:\Users\you\Desktop\sample-folder --dry-run
 ```
 
 helper script:
@@ -160,7 +160,13 @@ python3 -m pip install -r requirements-dev.txt
 v1 기본 배포 형식은 디버깅이 쉬운 `onedir`입니다. 내부 명령은 macOS와 Windows 모두 다음 형태입니다.
 
 ```bash
-pyinstaller --onedir --name mark-down mark_down.py
+pyinstaller --onedir --name mark-down --icon assets/icons/mark-down.icns --paths src bin/mark_down.py
+```
+
+Windows에서는 icon 경로만 `.ico`로 바뀝니다.
+
+```powershell
+pyinstaller --onedir --name mark-down --icon assets\icons\mark-down.ico --paths src bin\mark_down.py
 ```
 
 ### macOS 빌드
@@ -196,6 +202,16 @@ dist\mark-down\
 
 - `main` push 또는 pull request: 테스트와 OS별 PyInstaller build artifact 생성
 - `v*` tag push: GitHub Release에 macOS/Windows zip 파일 업로드
+
+## repo 구조
+```text
+bin/                 실행 launcher
+src/                 변환 로직
+scripts/             설치/실행/빌드 helper
+assets/icons/        PyInstaller 앱 아이콘
+tests/               unit tests
+.github/workflows/   GitHub Actions release build
+```
 
 ## 안전 규칙
 - 한 번 실행하고 종료합니다. 상주 watcher가 아닙니다.
