@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 cd "$ROOT_DIR"
 
@@ -30,4 +30,4 @@ python -m pip install -r 개발/requirements.txt
 python 실행/mark_down.py --list-supported
 
 printf '\nSetup complete. Try:\n'
-printf '  실행/run_macos.sh --input /path/to/folder --dry-run\n'
+printf '  실행/macOS/run.sh --input /path/to/folder --dry-run\n'

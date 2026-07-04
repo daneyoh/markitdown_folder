@@ -21,8 +21,8 @@ jobs:
         with:
           python-version: "3.10"
       - run: python -m py_compile 개발/src/mark_down.py 실행/mark_down.py
-      - run: bash -n 실행/setup_macos.sh
-      - run: bash -n 실행/run_macos.sh
+      - run: bash -n 실행/macOS/setup.sh
+      - run: bash -n 실행/macOS/run.sh
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -r 개발/requirements.txt
       - run: python -c "from markitdown import MarkItDown; MarkItDown(); print('markitdown import ok')"

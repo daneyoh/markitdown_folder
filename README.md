@@ -17,17 +17,17 @@ cd markitdown_folder
 macOS:
 
 ```bash
-실행/setup_macos.sh
-실행/run_macos.sh --input /Users/you/Desktop/sample-folder --dry-run
-실행/run_macos.sh --input /Users/you/Desktop/sample-folder
+실행/macOS/setup.sh
+실행/macOS/run.sh --input /Users/you/Desktop/sample-folder --dry-run
+실행/macOS/run.sh --input /Users/you/Desktop/sample-folder
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\실행\setup_windows.ps1
-.\실행\run_windows.bat --input C:\Users\you\Desktop\sample-folder --dry-run
-.\실행\run_windows.bat --input C:\Users\you\Desktop\sample-folder
+.\실행\Windows\setup.ps1
+.\실행\Windows\run.bat --input C:\Users\you\Desktop\sample-folder --dry-run
+.\실행\Windows\run.bat --input C:\Users\you\Desktop\sample-folder
 ```
 
 ## 지원 파일
@@ -87,22 +87,22 @@ python -m pip install -r 개발/requirements.txt
 또는:
 
 ```bash
-실행/setup_macos.sh
+실행/macOS/setup.sh
 ```
 
-`실행/setup_macos.sh`는 `python3.12`, `python3.11`, `python3.10`, `python3` 순서로 Python 3.10+를 찾습니다.
+`실행/macOS/setup.sh`는 `python3.12`, `python3.11`, `python3.10`, `python3` 순서로 Python 3.10+를 찾습니다.
 
 ## macOS 실행
 `--input`은 필수입니다. 입력 폴더를 지정하지 않으면 변환하지 않고 사용법만 보여줍니다.
 
 ```bash
-실행/run_macos.sh --input /Users/you/Desktop/sample-folder
+실행/macOS/run.sh --input /Users/you/Desktop/sample-folder
 ```
 
 미리보기:
 
 ```bash
-실행/run_macos.sh --input /Users/you/Desktop/sample-folder --dry-run
+실행/macOS/run.sh --input /Users/you/Desktop/sample-folder --dry-run
 ```
 
 ## Windows 설치
@@ -118,22 +118,22 @@ python -m pip install -r .\개발\requirements.txt
 또는:
 
 ```powershell
-.\실행\setup_windows.ps1
+.\실행\Windows\setup.ps1
 ```
 
-`.\실행\setup_windows.ps1`는 `py -3`가 Python 3.10+인지 확인한 뒤 venv를 만듭니다.
+`.\실행\Windows\setup.ps1`는 `py -3`가 Python 3.10+인지 확인한 뒤 venv를 만듭니다.
 
 ## Windows 실행
 `--input`은 필수입니다. 입력 폴더를 지정하지 않으면 변환하지 않고 사용법만 보여줍니다.
 
 ```bat
-실행\run_windows.bat --input C:\Users\you\Desktop\sample-folder
+실행\Windows\run.bat --input C:\Users\you\Desktop\sample-folder
 ```
 
 미리보기:
 
 ```bat
-실행\run_windows.bat --input C:\Users\you\Desktop\sample-folder --dry-run
+실행\Windows\run.bat --input C:\Users\you\Desktop\sample-folder --dry-run
 ```
 
 ## 옵션
@@ -147,7 +147,9 @@ python -m pip install -r .\개발\requirements.txt
 ## repo 구조
 ```text
 README.md            사용 설명
-실행/                사용자용 설치/실행 스크립트
+실행/mark_down.py    공통 Python launcher
+실행/macOS/          macOS용 설치/실행 스크립트
+실행/Windows/        Windows용 설치/실행 스크립트
 개발/src/            변환 로직
 개발/tests/          unit tests
 개발/requirements.txt  Microsoft MarkItDown 의존성

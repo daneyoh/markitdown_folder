@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop"
 
-$RootDir = Split-Path -Parent $PSScriptRoot
+$RootDir = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location $RootDir
 
 $VersionCheck = "import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)"
@@ -19,4 +19,4 @@ python $Launcher --list-supported
 
 Write-Host ""
 Write-Host "Setup complete. Try:"
-Write-Host "  .\실행\run_windows.bat --input C:\path\to\folder --dry-run"
+Write-Host "  .\실행\Windows\run.bat --input C:\path\to\folder --dry-run"

@@ -184,6 +184,8 @@ class MarkDownTests(unittest.TestCase):
             "원본완료/<형식>/",
             "Microsoft MarkItDown",
             "실행/",
+            "실행/macOS/",
+            "실행/Windows/",
             "개발/",
             "--input",
             "--dry-run",

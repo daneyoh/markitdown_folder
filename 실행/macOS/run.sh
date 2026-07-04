@@ -2,14 +2,14 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 if [[ -f "$ROOT_DIR/.venv/bin/activate" ]]; then
   # shellcheck disable=SC1091
   source "$ROOT_DIR/.venv/bin/activate"
   PYTHON_BIN="python"
   if ! "$PYTHON_BIN" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 10) else 1)'; then
-    printf 'Python 3.10+ is required. Re-run 실행/setup_macos.sh after installing Python 3.10+.\n' >&2
+    printf 'Python 3.10+ is required. Re-run 실행/macOS/setup.sh after installing Python 3.10+.\n' >&2
     exit 1
   fi
 else
@@ -25,7 +25,7 @@ else
   }
 
   PYTHON_BIN="$(find_python)" || {
-    printf 'Python 3.10+ is required. Run 실행/setup_macos.sh after installing Python 3.10+.\n' >&2
+    printf 'Python 3.10+ is required. Run 실행/macOS/setup.sh after installing Python 3.10+.\n' >&2
     exit 1
   }
 fi
