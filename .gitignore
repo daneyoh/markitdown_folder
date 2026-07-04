@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+build/
+dist/
+*.spec
+markdown/
+processed/
+logs/
+.omx/state/
+.omx/tmux-hook.json
