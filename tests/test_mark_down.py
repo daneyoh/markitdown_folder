@@ -41,8 +41,10 @@ class MarkDownTests(unittest.TestCase):
             (root / ".hidden.txt").write_text("hidden", encoding="utf-8")
             (root / "nested").mkdir()
             (root / "nested" / "nested.txt").write_text("nested", encoding="utf-8")
-            (root / "markdown").mkdir()
-            (root / "markdown" / "old.txt").write_text("old", encoding="utf-8")
+            (root / "변환").mkdir()
+            (root / "변환" / "old.txt").write_text("old", encoding="utf-8")
+            (root / "원본완료").mkdir()
+            (root / "원본완료" / "old.txt").write_text("old", encoding="utf-8")
 
             scanned = [path.name for path in mark_down.scan_root_only(root)]
             self.assertEqual(scanned, ["a.txt", "b.pdf"])
@@ -67,10 +69,10 @@ class MarkDownTests(unittest.TestCase):
             self.assertEqual(summary.moved, 1)
             self.assertFalse(source.exists())
             self.assertEqual(
-                (root / "markdown" / "txt" / "report.md").read_text(encoding="utf-8"),
+                (root / "변환" / "txt" / "report.md").read_text(encoding="utf-8"),
                 "# converted report.txt\n",
             )
-            self.assertTrue((root / "processed" / "txt" / "report.txt").exists())
+            self.assertTrue((root / "원본완료" / "txt" / "report.txt").exists())
             log_lines = (root / "logs" / "conversions.jsonl").read_text(encoding="utf-8").splitlines()
             self.assertEqual(json.loads(log_lines[0])["status"], "converted")
 
@@ -79,17 +81,17 @@ class MarkDownTests(unittest.TestCase):
             root = Path(tmp)
             source = root / "report.txt"
             source.write_text("new", encoding="utf-8")
-            (root / "markdown" / "txt").mkdir(parents=True)
-            (root / "processed" / "txt").mkdir(parents=True)
-            (root / "markdown" / "txt" / "report.md").write_text("old", encoding="utf-8")
-            (root / "processed" / "txt" / "report.txt").write_text("old", encoding="utf-8")
+            (root / "변환" / "txt").mkdir(parents=True)
+            (root / "원본완료" / "txt").mkdir(parents=True)
+            (root / "변환" / "txt" / "report.md").write_text("old", encoding="utf-8")
+            (root / "원본완료" / "txt" / "report.txt").write_text("old", encoding="utf-8")
 
             summary = mark_down.convert_folder(root, converter=FakeConverter())
 
             self.assertEqual(summary.converted, 1)
-            self.assertTrue((root / "markdown" / "txt" / "report-001.md").exists())
-            self.assertTrue((root / "processed" / "txt" / "report-001.txt").exists())
-            self.assertEqual((root / "processed" / "txt" / "report.txt").read_text(encoding="utf-8"), "old")
+            self.assertTrue((root / "변환" / "txt" / "report-001.md").exists())
+            self.assertTrue((root / "원본완료" / "txt" / "report-001.txt").exists())
+            self.assertEqual((root / "원본완료" / "txt" / "report.txt").read_text(encoding="utf-8"), "old")
 
     def test_failed_conversion_keeps_source_and_logs_error(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -101,7 +103,7 @@ class MarkDownTests(unittest.TestCase):
 
             self.assertEqual(summary.failed, 1)
             self.assertTrue(source.exists())
-            self.assertFalse((root / "markdown").exists())
+            self.assertFalse((root / "변환").exists())
             log_lines = (root / "logs" / "conversions.jsonl").read_text(encoding="utf-8").splitlines()
             event = json.loads(log_lines[0])
             self.assertEqual(event["status"], "failed")
@@ -119,8 +121,8 @@ class MarkDownTests(unittest.TestCase):
             self.assertEqual(summary.planned, 1)
             self.assertEqual(converter.seen, [])
             self.assertTrue(source.exists())
-            self.assertFalse((root / "markdown").exists())
-            self.assertFalse((root / "processed").exists())
+            self.assertFalse((root / "변환").exists())
+            self.assertFalse((root / "원본완료").exists())
             self.assertFalse((root / "logs").exists())
 
     def test_source_mode_cli_smoke_with_list_supported(self):
@@ -146,6 +148,8 @@ class MarkDownTests(unittest.TestCase):
             "Python 3.10+",
             "## repo 구조",
             "assets/icons",
+            "변환/<형식>/",
+            "원본완료/<형식>/",
             "pyinstaller --onedir --name mark-down --icon assets/icons/mark-down.icns --paths src bin/mark_down.py",
             "--input",
             "--dry-run",

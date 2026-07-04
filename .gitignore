@@ -1,9 +1,12 @@
 .venv/
+.DS_Store
 __pycache__/
 .pytest_cache/
 build/
 dist/
 *.spec
+변환/
+원본완료/
 markdown/
 processed/
 logs/

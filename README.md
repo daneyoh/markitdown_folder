@@ -1,10 +1,10 @@
 # Mark Down 자동 정리 도구
 
 ## 만든 목적
-로컬 폴더에 모아 둔 문서 파일을 한 번 실행으로 Markdown으로 변환하고, 성공한 원본은 `processed/`로 옮겨 폴더를 정리하기 위한 도구입니다.
+로컬 폴더에 모아 둔 문서 파일을 한 번 실행으로 Markdown으로 변환하고, 성공한 원본은 `원본완료/`로 옮겨 폴더를 정리하기 위한 도구입니다.
 
 ## 한 줄 요약
-`python bin/mark_down.py --input ./input-folder`를 실행하면 지원 파일을 `markdown/<확장자>/`에 `.md`로 저장하고, 성공한 원본만 `processed/<확장자>/`로 이동합니다.
+`python bin/mark_down.py --input ./input-folder`를 실행하면 지원 파일을 `변환/<형식>/`에 `.md`로 저장하고, 성공한 원본만 `원본완료/<형식>/`로 이동합니다.
 
 ## 빠른 시작
 GitHub에서 ZIP으로 내려받거나 `git clone`으로 받은 뒤, 아래 순서대로 실행하세요.
@@ -62,10 +62,10 @@ work-folder/
 ```text
 work-folder/
   image.png
-  markdown/
+  변환/
     pdf/report.md
     txt/memo.md
-  processed/
+  원본완료/
     pdf/report.pdf
     txt/memo.txt
   logs/
@@ -144,8 +144,8 @@ scripts\run_windows.bat --input C:\Users\you\Desktop\sample-folder
 
 ## 옵션
 - `--input`: 한 번 스캔할 로컬 폴더입니다. 기본값은 현재 폴더입니다.
-- `--output`: Markdown 출력 폴더입니다. 기본값은 `markdown`입니다.
-- `--processed`: 성공한 원본 이동 폴더입니다. 기본값은 `processed`입니다.
+- `--output`: Markdown 출력 폴더입니다. 기본값은 `변환`입니다.
+- `--processed`: 성공한 원본 이동 폴더입니다. 기본값은 `원본완료`입니다.
 - `--log`: JSONL 로그 파일입니다. 기본값은 `logs/conversions.jsonl`입니다.
 - `--dry-run`: 쓰기와 이동 없이 예정 작업만 출력합니다.
 - `--list-supported`: 지원 확장자를 출력합니다.
@@ -203,6 +203,28 @@ dist\mark-down\
 - `main` push 또는 pull request: 테스트와 OS별 PyInstaller build artifact 생성
 - `v*` tag push: GitHub Release에 macOS/Windows zip 파일 업로드
 
+## 사용자 폴더 구조
+실행 파일을 폴더에 넣고 실행하면 기본 결과는 아래처럼 정리됩니다.
+
+```text
+work-folder/
+  mark-down 실행파일
+  변환/
+    pdf/
+    docx/
+    xlsx/
+    txt/
+  원본완료/
+    pdf/
+    docx/
+    xlsx/
+    txt/
+  logs/
+    conversions.jsonl
+```
+
+`변환/<형식>/`에는 Markdown 결과물만 들어갑니다. 원본 파일은 `원본완료/<형식>/`에 따로 보관합니다.
+
 ## repo 구조
 ```text
 bin/                 실행 launcher
@@ -216,9 +238,9 @@ tests/               unit tests
 ## 안전 규칙
 - 한 번 실행하고 종료합니다. 상주 watcher가 아닙니다.
 - 입력 폴더의 root 파일만 스캔합니다. 하위 폴더는 v1에서 무시합니다.
-- 숨김 파일과 생성 폴더(`markdown/`, `processed/`, `logs/`)는 건드리지 않습니다.
+- 숨김 파일과 생성 폴더(`변환/`, `원본완료/`, `logs/`)는 건드리지 않습니다.
 - 기존 Markdown이나 이동 대상 원본을 덮어쓰지 않습니다. 충돌 시 `report-001.md`처럼 번호를 붙입니다.
-- 변환 성공한 원본만 `processed/<확장자>/`로 이동합니다.
+- 변환 성공한 원본만 `원본완료/<형식>/`로 이동합니다.
 - 실패한 파일은 원래 위치에 그대로 둡니다.
 - URL, cloud, LLM, OCR, audio 변환은 v1 범위가 아닙니다.
 

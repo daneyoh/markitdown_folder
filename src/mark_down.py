@@ -25,7 +25,13 @@ SUPPORTED_EXTENSIONS = {
     "xml",
 }
 
+DEFAULT_OUTPUT_DIR = Path("변환")
+DEFAULT_PROCESSED_DIR = Path("원본완료")
+DEFAULT_LOG_FILE = Path("logs/conversions.jsonl")
+
 GENERATED_DIR_NAMES = {
+    "변환",
+    "원본완료",
     "markdown",
     "processed",
     "logs",
@@ -280,9 +286,9 @@ def convert_plan(plan: ConversionPlan, converter: Converter, log_file: Path) -> 
 
 def convert_folder(
     input_dir: Path,
-    output_dir: Path = Path("markdown"),
-    processed_dir: Path = Path("processed"),
-    log_file: Path = Path("logs/conversions.jsonl"),
+    output_dir: Path = DEFAULT_OUTPUT_DIR,
+    processed_dir: Path = DEFAULT_PROCESSED_DIR,
+    log_file: Path = DEFAULT_LOG_FILE,
     converter: Optional[Converter] = None,
     dry_run: bool = False,
 ) -> Summary:
@@ -367,19 +373,19 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("markdown"),
+        default=DEFAULT_OUTPUT_DIR,
         help="Markdown output folder. Relative paths are created under the input folder.",
     )
     parser.add_argument(
         "--processed",
         type=Path,
-        default=Path("processed"),
+        default=DEFAULT_PROCESSED_DIR,
         help="Folder for successfully converted originals. Relative paths are under the input folder.",
     )
     parser.add_argument(
         "--log",
         type=Path,
-        default=Path("logs/conversions.jsonl"),
+        default=DEFAULT_LOG_FILE,
         help="JSONL conversion log path. Relative paths are under the input folder.",
     )
     parser.add_argument(
