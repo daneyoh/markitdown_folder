@@ -5,6 +5,13 @@
 ## 만든 목적
 로컬 폴더에 모인 문서 파일을 Microsoft MarkItDown 기반으로 Markdown으로 변환하고, 원본 파일을 형식별로 따로 보관하기 위한 도구입니다.
 
+## 출처
+이 프로젝트는 Microsoft의 `markitdown`을 변환 엔진으로 사용한 별도 래퍼 도구입니다.
+
+- 원본 프로젝트: [microsoft/markitdown](https://github.com/microsoft/markitdown)
+- 이 레포 역할: 폴더 자동 정리, 실행 스크립트, setup, 사용 가이드 추가
+- 주의: Microsoft 공식 배포본이나 공식 fork가 아니라, `markitdown` 기반의 별도 프로젝트입니다.
+
 ## 한 줄 요약
 `실행/mark_down.py --input <정리할 폴더>`를 실행하면 Markdown 결과는 `변환/<형식>/`에 저장되고, 성공한 원본은 `원본완료/<형식>/`로 이동합니다.
 

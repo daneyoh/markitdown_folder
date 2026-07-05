@@ -10,5 +10,6 @@ markdown/
 processed/
 logs/
 .omx/
+.omc/
 변환할PDF/
 테스트보드/
